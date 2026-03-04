@@ -1,3 +1,4 @@
 pip install -r .\Requirements.txt <br />
-git add file_name <br />
-git push file_name
+git add . <br />
+git commit .
+git push --set-upstream origin main
