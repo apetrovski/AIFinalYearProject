@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+from decision_rules import rules
+
 
 np.random.seed(3) #makes sure the random number generator produces the same values everytime. Makes sure that the dataset is reproducible.
 
@@ -27,21 +29,23 @@ torque = 40 - (rota_speed/100) + np.random.normal(loc = 0, scale = 2, size = no_
 tool_wear = np.cumsum(np.random.normal(loc = 0.05, scale = 0.01,size = no_samples)) #produces a tool wear that increases incrementally with a little variation with each iteration
 
 #Rules for failure and operation
-risk_score = (
-    0.04*(process_temp - 310) +
-    0.03*(torque - 40) +
-    0.002*(1500 - rota_speed) +
-    0.01*((tool_wear > 200))   
-) #Risk score created by summing the difference between the variables and their normal operating values and then multiplying by the weighting that each variable will have an effect.  
+#risk_score = (
+#    0.04*(process_temp - 310) +
+#    0.03*(torque - 40) +
+#    0.002*(1500 - rota_speed) +
+#    0.01*((tool_wear > 200))   
+#) #Risk score created by summing the difference between the variables and their normal operating values and then multiplying by the weighting that each variable will have an effect.  
 
-print(risk_score)
+#print(risk_score)
 
-failure_prob =1/(1+np.exp(-risk_score))  #sigmoid function converts risk_score into a probability between 0-1. high risk_score produces a postive number so sigmoid produces a number close to 1. low risk is negative so sigmoid produces number close to 0
-operation = np.random.binomial(1,failure_prob) #Simulates 1 test with the probability of using failure_prob this then produces a 1 or 0 for failure or non-failure.
+#failure_prob =1/(1+np.exp(-risk_score))  #sigmoid function converts risk_score into a probability between 0-1. high risk_score produces a postive number so sigmoid produces a number close to 1. low risk is negative so sigmoid produces number close to 0
+#operation = np.random.binomial(1,failure_prob) #Simulates 1 test with the probability of using failure_prob this then produces a 1 or 0 for failure or non-failure.
 
-print("Percentage of failure in dataset:",((operation.sum())/no_samples)*100,"%") #Used for checking how many failures are created in the dataset.
+#print("Percentage of failure in dataset:",((operation.sum())/no_samples)*100,"%") #Used for checking how many failures are created in the dataset.
 
+#Rules doesnt work as it is random. so model can't predict.
 
+operation = rules()
 
 df = pd.DataFrame({
     "Air_Temperature": air_temp,
@@ -51,7 +55,7 @@ df = pd.DataFrame({
     "Tool_wear": tool_wear,
     "Operation": operation
 
-})
+}) #Combines the different arrays that 
 
 df.head()
 df = df.round(2)
