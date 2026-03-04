@@ -45,17 +45,30 @@ tool_wear = np.cumsum(np.random.normal(loc = 0.05, scale = 0.01,size = no_sample
 
 #Rules doesnt work as it is random. so model can't predict.
 
-operation = rules()
+#operation = rules(process_temp, rota_speed,torque,tool_wear)
 
 df = pd.DataFrame({
     "Air_Temperature": air_temp,
     "Process_Temperature": process_temp,
     "Rotational_Speed": rota_speed,
     "Torque": torque,
-    "Tool_wear": tool_wear,
-    "Operation": operation
+    "Tool_wear": tool_wear
 
 }) #Combines the different arrays that 
+
+# Apply the rule row by row
+df["Operation"] = df.apply(
+    lambda row: rules(
+        row["Process_Temperature"],
+        row["Rotational_Speed"],
+        row["Torque"],
+        row["Tool_wear"]
+    ),
+    axis=1
+)
+
+print(df)
+print("Total failures:", df["Operation"].sum())
 
 df.head()
 df = df.round(2)
