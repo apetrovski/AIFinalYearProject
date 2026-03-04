@@ -1,16 +1,16 @@
 import numpy as np
 
-def rules(Process_Temperature, Rotational_Speed, Torque, Tool_wear):
-    if Process_Temperature > 318:
+def rules(process_temp, rota_speed, torque, tool_wear):
+    if process_temp > 318:
         return 1
     
-    if Rotational_Speed > 1800:
+    if rota_speed > 1800:
         return 1
     
-    if Torque > 55:
+    if torque > 55:
         return 1
     
-    if Tool_wear > 200:
+    if tool_wear > 200:
         return 1
 
     return 0
