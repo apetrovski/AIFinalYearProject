@@ -7,7 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 import matplotlib.pyplot as plt
 import seaborn
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-from sklearn.model_selection import
+#from sklearn.model_selection import
 
 
 df = pandas.read_csv("DatasetAnton.csv") #Reads the dataset.csv file

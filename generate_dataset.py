@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
-from decision_rules import rules
+import sys
 
+from rules import rules
 
 np.random.seed(3) #makes sure the random number generator produces the same values everytime. Makes sure that the dataset is reproducible.
 
@@ -68,10 +69,12 @@ df["Operation"] = df.apply(
 )
 
 print(df)
-print("Total failures:", df["Operation"].sum())
+#print("Total failures:", df["Operation"].sum())
+print("Total failures:", df["Operation"].sum(), file=sys.stderr)
 
 df.head()
 df = df.round(2)
 print(df)
 
-df.to_csv("DatasetAnton.csv",index = False) #Saves the dataset into a csv file for machine learning models 
+#df.to_csv("synthetic_machine_data.csv",index = False)
+df.to_csv(sys.stdout, index=False)
