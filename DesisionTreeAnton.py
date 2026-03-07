@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 #from sklearn.model_selection import
 
 
-df = pandas.read_csv("DatasetAnton.csv") #Reads the dataset.csv file
+df = pandas.read_csv("dataset_output.csv") #Reads the dataset.csv file
 
 features = ["Air_Temperature","Process_Temperature","Rotational_Speed","Torque","Tool_wear"] #Splits the data set into features of the machine and operation values
 y = df["Operation"]

@@ -4,7 +4,7 @@ def rules(process_temp, rota_speed, torque, tool_wear):
     if (process_temp >= 318):
         return 1
     
-    if (rota_speed >= 1800):
+    if (rota_speed >= 1800 | rota_speed <= 1200):
         return 1
     
     if (torque >= 55):

@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import matplotlib.pyplot as plt
 import seaborn
 
-df = pandas.read_csv("DatasetAnton.csv")
+df = pandas.read_csv("dataset_output.csv")
 
 features = ["Air_Temperature","Process_Temperature","Rotational_Speed","Torque","Tool_wear"]
 y = df["Operation"]
