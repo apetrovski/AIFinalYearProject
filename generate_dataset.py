@@ -19,7 +19,7 @@ process_temp = air_temp + np.random.normal(loc = 10,scale = 1.5, size = no_sampl
     #print((((process_temp > 318).sum())/no_samples)*100) #Likely would cause failures at this temperature.
 
 #Rotational speed(RPM)
-rota_speed = np.random.normal(loc = 1500, scale  = 100, size = no_samples) #Based around 1500rpm, standard deviation of 300
+rota_speed = np.random.normal(loc = 1400, scale  = 300, size = no_samples) #Based around 1400rpm, standard deviation of 100
 #print(((rota_speed > 1800) | (rota_speed < 1200)).sum()) #checks how many values are outside the range showing how many values are outside the range likely showing issues
 
 #Torque (increases when speed decreases)
@@ -27,7 +27,19 @@ torque = 40 - (rota_speed/100) + np.random.normal(loc = 0, scale = 2, size = no_
 #print(torque)
 
 #Tool wear
-tool_wear = np.cumsum(np.random.normal(loc = 0.05, scale = 0.01,size = no_samples)) #produces a tool wear that increases incrementally with a little variation with each iteration
+#tool_wear = np.cumsum(np.random.normal(loc = 0.05, scale = 0.01,size = no_samples)) #produces a tool wear that increases incrementally with a little variation with each iteration
+tool_wear = []
+wear = 0
+
+for i in range(no_samples):
+    wear += np.random.normal(0.05, 0.01)
+
+    if wear > 250:   # tool replaced
+        wear = 0
+
+    tool_wear.append(wear)
+
+tool_wear = np.array(tool_wear)
 
 #Rules for failure and operation
 #risk_score = (
@@ -60,6 +72,7 @@ df = pd.DataFrame({
 # Apply the rule row by row
 df["Operation"] = df.apply(
     lambda row: rules(
+        row["Air_Temperature"],
         row["Process_Temperature"],
         row["Rotational_Speed"],
         row["Torque"],
@@ -68,13 +81,13 @@ df["Operation"] = df.apply(
     axis=1
 )
 
-print(df)
+#print(df)
 #print("Total failures:", df["Operation"].sum())
-print("Total failures:", df["Operation"].sum(), file=sys.stderr)
+print("Total failures:", df["Operation"].sum(),"/",no_samples, file=sys.stderr)
 
-df.head()
+#df.head()
 df = df.round(2)
-print(df)
+#print(df)
 
 #df.to_csv("synthetic_machine_data.csv",index = False)
 df.to_csv(sys.stdout, index=False)

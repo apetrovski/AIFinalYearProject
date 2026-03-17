@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
 import matplotlib.pyplot as plt
 import seaborn
 
@@ -71,11 +71,28 @@ recall = recall_score(YTest, y_pred)
 f1 = f1_score(YTest, y_pred)
 cm = confusion_matrix(YTest, y_pred)
 
+y_scores = log_model.predict_proba(XTest)[:,1]
+fpr, tpr, thresholds = roc_curve(YTest, y_scores)
+roc_auc = auc(fpr, tpr)
+print("AUC:", roc_auc)
+
 print("Accuracy:", accuracy)
 print("Precision:", precision)
 print("Recall:", recall)
 print("F1-score:", f1)
 print("Confusion Matrix:\n", cm)
+
+plt.figure()
+
+plt.plot(fpr, tpr, label="ROC curve (AUC = %0.3f)" % roc_auc)
+plt.plot([0,1], [0,1], linestyle="--")   # Random classifier line
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve")
+plt.legend(loc="lower right")
+
+plt.show()
 
 plt.figure(figsize=(6, 5))
 seaborn.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
