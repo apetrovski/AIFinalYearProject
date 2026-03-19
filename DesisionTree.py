@@ -1,63 +1,58 @@
-import pandas
 import numpy as np
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
+import sys
+import matplotlib
+import pandas as pd
+from sklearn import tree
+from sklearn.tree import DecisionTreeClassifier
 import matplotlib.pyplot as plt
 import seaborn
+from sklearn.metrics import accuracy_score, confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
+#from sklearn.model_selection import
 
-df = pandas.read_csv("dataset_output.csv")
 
-features = ["Air_Temperature","Process_Temperature","Rotational_Speed","Torque","Tool_wear"]
+df = pd.read_csv("dataset_output.csv") #Reads the dataset.csv file
+
+features = ["Air_Temperature","Process_Temperature","Rotational_Speed","Torque","Tool_wear"] #Splits the data set into features of the machine and operation values
 y = df["Operation"]
 
-# Split data
 x = df[features]
-trainingvalues = int(len(x)*0.8)
+trainingvalues = int(len(x)*0.8) #splits the data into training set and testing set with a ratio of 80:20 split
 Xlearn = x[:trainingvalues]
 Ylearn = y[:trainingvalues]
 XTest = x[trainingvalues:]
 YTest = y[trainingvalues:]
 
-# Create model
-log_model = LogisticRegression()
+tree_model = DecisionTreeClassifier(
+    criterion = "entropy",
+    max_depth = 3,
+    class_weight = "balanced",
+)
 
-# Train model (calculates weights)
-log_model.fit(Xlearn, Ylearn)
+tree_model.fit(Xlearn, Ylearn)
 
-# Get weights
-print("Intercept LogisticRegression (β0):", log_model.intercept_)
-print("Coefficients LogisticRegression (β1, β2, β3):", log_model.coef_)
-print("\n")
 
-# Predict probabilities
-y_prob = log_model.predict_proba(XTest)[:,1]  # Probability of failure
 
-# Predict classes (0 = normal, 1 = failure)
-#y_pred = log_model.predict(XTest)
+plt.figure(figsize=(20,10))
 
-beta = log_model.coef_[0]  # Convert (1,5) → (5,)
-intercept = log_model.intercept_[0]
+tree.plot_tree(
+    tree_model,
+    feature_names = x.columns,
+    class_names = ["Normal", "Failure"],
+    filled = True
+)
 
-# Loop over each test sample
-probabilities = []
-for i in range(XTest.shape[0]):
-    x = XTest.iloc[i].values  # or X_test[i] if numpy array
-    z = intercept + np.dot(beta, x)
-    prob = 1 / (1 + np.exp(-z))
-    probabilities.append(prob)
+plt.show()
 
-probabilities = np.array(probabilities)
+probabilities = tree_model.predict_proba(XTest)[:,1]
 
-# probabilities is an array of shape (num_samples,)
 y_pred = (probabilities > 0.5).astype(int)
-
 accuracy = accuracy_score(YTest, y_pred)
 precision = precision_score(YTest, y_pred)
 recall = recall_score(YTest, y_pred)
 f1 = f1_score(YTest, y_pred)
 cm = confusion_matrix(YTest, y_pred)
 
-y_scores = log_model.predict_proba(XTest)[:,1]
+y_scores = tree_model.predict_proba(XTest)[:,1]
 fpr, tpr, thresholds = roc_curve(YTest, y_scores)
 roc_auc = auc(fpr, tpr)
 print("AUC:", roc_auc)
