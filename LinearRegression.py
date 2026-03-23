@@ -1,47 +1,86 @@
 import pandas
 import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
 import matplotlib.pyplot as plt
 import seaborn
+from sklearn.model_selection import train_test_split
+
+
+scaler = StandardScaler()
 
 df = pandas.read_csv("dataset_output.csv")
 
 features = ["Air_Temperature","Process_Temperature","Rotational_Speed","Torque","Tool_wear"]
 y = df["Operation"]
 
-# Split data
-x = df[features]
-trainingvalues = int(len(x)*0.8)
-Xlearn = x[:trainingvalues]
-Ylearn = y[:trainingvalues]
-XTest = x[trainingvalues:]
-YTest = y[trainingvalues:]
-
 # Create model
 log_model = LogisticRegression()
 
-# Train model (calculates weights)
-log_model.fit(Xlearn, Ylearn)
+# Split data
+x = df[features]
+#trainingvalues = int(len(x)*0.8)
+#Xlearn = x[:trainingvalues]
+#Ylearn = y[:trainingvalues]
+#XTest = x[trainingvalues:]
+#YTest = y[trainingvalues:]
+
+Xlearn, XTest, Ylearn, YTest = train_test_split(
+    x, y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+
+Xlearn_scaled = scaler.fit_transform(Xlearn)
+XTest_scaled = scaler.transform(XTest)
+
+parameter_test = {
+    'penalty': ['l2'],
+    'C': [0.01, 0.1, 1, 10, 100],
+    'solver': ['liblinear', 'lbfgs'],
+    'max_iter': [1000, 2000],
+    'class_weight': [None, 'balanced']
+}
+
+grid_search = GridSearchCV(
+    log_model, 
+    parameter_test,
+    cv = 5,
+    scoring = 'recall',
+    n_jobs=-1,  #number of cpus - all
+    )
+
+grid_search.fit(Xlearn_scaled, Ylearn)
+
+best_model = grid_search.best_estimator_
+#print(type(best_model))
+
+y_pred = best_model.predict(XTest_scaled)
+# Best parameters
+
+print("Best Parameters:", grid_search.best_params_)
 
 # Get weights
-print("Intercept LogisticRegression (β0):", log_model.intercept_)
-print("Coefficients LogisticRegression (β1, β2, β3):", log_model.coef_)
+print("Intercept LogisticRegression (β0):", best_model.intercept_)
+print("Coefficients LogisticRegression (β1, β2, β3):", best_model.coef_)
 print("\n")
 
 # Predict probabilities
-y_prob = log_model.predict_proba(XTest)[:,1]  # Probability of failure
+y_prob = best_model.predict_proba(XTest_scaled)[:,1]  # Probability of failure
 
 # Predict classes (0 = normal, 1 = failure)
 #y_pred = log_model.predict(XTest)
 
-beta = log_model.coef_[0]  # Convert (1,5) → (5,)
-intercept = log_model.intercept_[0]
+beta = best_model.coef_[0]  # Convert (1,5) → (5,)
+intercept = best_model.intercept_[0]
 
 # Loop over each test sample
 probabilities = []
-for i in range(XTest.shape[0]):
-    x = XTest.iloc[i].values  # or X_test[i] if numpy array
+for i in range(XTest_scaled.shape[0]):
+    x = XTest_scaled[i]  # or X_test[i] if numpy array
     z = intercept + np.dot(beta, x)
     prob = 1 / (1 + np.exp(-z))
     probabilities.append(prob)
@@ -57,7 +96,7 @@ recall = recall_score(YTest, y_pred)
 f1 = f1_score(YTest, y_pred)
 cm = confusion_matrix(YTest, y_pred)
 
-y_scores = log_model.predict_proba(XTest)[:,1]
+y_scores = best_model.predict_proba(XTest_scaled)[:,1]
 fpr, tpr, thresholds = roc_curve(YTest, y_scores)
 roc_auc = auc(fpr, tpr)
 print("AUC:", roc_auc)

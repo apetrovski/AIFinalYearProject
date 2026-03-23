@@ -7,6 +7,8 @@ from sklearn.ensemble import RandomForestClassifier
 import matplotlib.pyplot as plt
 import seaborn
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
+from sklearn.model_selection import RandomizedSearchCV
+
 
 df = pd.read_csv("dataset_output.csv") #Reads the dataset.csv file
 
@@ -20,11 +22,39 @@ Ylearn = y[:trainingvalues]
 XTest = x[trainingvalues:]
 YTest = y[trainingvalues:]
 
-rf_model = RandomForestClassifier(n_estimators=100, random_state=42) #n_estimators → number of decision trees. random_state → ensures reproducible results
 
-rf_model.fit(Xlearn, Ylearn)
+parameter_test = {
+    'n_estimators': [100, 200, 300, 400, 500], #number of decision trees
+    'max_depth': [None, 10, 20, 30, 40],       #Sets the maximum number of levels between the root node to the deepest leaf  
+    'min_samples_split': [2, 5, 10],           #minimum samples needed to split a node
+    'min_samples_leaf': [1, 2, 4],             #minimum samples required in a leaf node after a split
+    'max_features': ['sqrt', 'log2'],
+    'class_weight': [None, 'balanced']           #
+}
 
-y_pred = rf_model.predict(XTest)
+
+rf_model = RandomForestClassifier() 
+
+
+random_search = RandomizedSearchCV(
+    rf_model, 
+    param_distributions = parameter_test,
+    n_iter = 50,
+    cv = 5,
+    scoring = 'accuracy',
+    n_jobs=-1,  #number of cpus - all
+    random_state= 42 
+    )
+
+random_search.fit(Xlearn, Ylearn)
+
+best_model = random_search.best_estimator_
+#print(type(best_model))
+
+y_pred = best_model.predict(XTest)
+# Best parameters
+
+print("Best Parameters:", random_search.best_params_)
 
 #Everything bellow is for results.
 
@@ -34,7 +64,7 @@ recall = recall_score(YTest, y_pred)
 f1 = f1_score(YTest, y_pred)
 cm = confusion_matrix(YTest, y_pred)
 
-y_scores = rf_model.predict_proba(XTest)[:,1]
+y_scores = best_model.predict_proba(XTest)[:,1]
 fpr, tpr, thresholds = roc_curve(YTest, y_scores)
 roc_auc = auc(fpr, tpr)
 print("AUC:", roc_auc)

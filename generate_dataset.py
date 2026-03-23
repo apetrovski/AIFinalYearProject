@@ -6,7 +6,7 @@ from rules import rules
 
 np.random.seed(3) #makes sure the random number generator produces the same values everytime. Makes sure that the dataset is reproducible.
 
-no_samples = 100000 #Dataset size. Allows it to be modified to get more data for testing.
+no_samples = 1000000 #Dataset size. Allows it to be modified to get more data for testing.
 
 
 #air_temp (ambient)
@@ -40,24 +40,6 @@ for i in range(no_samples):
     tool_wear.append(wear)
 
 tool_wear = np.array(tool_wear)
-
-#Rules for failure and operation
-#risk_score = (
-#    0.04*(process_temp - 310) +
-#    0.03*(torque - 40) +
-#    0.002*(1500 - rota_speed) +
-#    0.01*((tool_wear > 200))   
-#) #Risk score created by summing the difference between the variables and their normal operating values and then multiplying by the weighting that each variable will have an effect.  
-
-#print(risk_score)
-
-#failure_prob =1/(1+np.exp(-risk_score))  #sigmoid function converts risk_score into a probability between 0-1. high risk_score produces a postive number so sigmoid produces a number close to 1. low risk is negative so sigmoid produces number close to 0
-#operation = np.random.binomial(1,failure_prob) #Simulates 1 test with the probability of using failure_prob this then produces a 1 or 0 for failure or non-failure.
-
-#print("Percentage of failure in dataset:",((operation.sum())/no_samples)*100,"%") #Used for checking how many failures are created in the dataset.
-
-#Rules doesnt work as it is random. so model can't predict.
-
 #operation = rules(process_temp, rota_speed,torque,tool_wear)
 
 df = pd.DataFrame({
