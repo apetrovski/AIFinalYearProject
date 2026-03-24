@@ -1,13 +1,11 @@
-import numpy as np
-import sys
-import matplotlib
 import pandas as pd
 from sklearn import tree
 from sklearn.tree import DecisionTreeClassifier
 import matplotlib.pyplot as plt
 import seaborn
+from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score, confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
-#from sklearn.model_selection import
+from sklearn.model_selection import train_test_split
 
 
 df = pd.read_csv("dataset_output.csv") #Reads the dataset.csv file
@@ -22,20 +20,49 @@ Ylearn = y[:trainingvalues]
 XTest = x[trainingvalues:]
 YTest = y[trainingvalues:]
 
-tree_model = DecisionTreeClassifier(
-    criterion = "entropy",
-    max_depth = 3,
-    class_weight = "balanced",
+Xlearn, XTest, Ylearn, YTest = train_test_split(
+    x, y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
 )
 
-tree_model.fit(Xlearn, Ylearn)
 
+tree_model = DecisionTreeClassifier(random_state=42)
 
+# Hyperparameter grid
+parameter_test = {
+    "criterion": ["gini", "entropy", "log_loss"],
+    "max_depth": [3, 5, 7, 10, 15, 20],
+    "min_samples_split": [2, 5, 10, 20],
+    "min_samples_leaf": [1, 2, 5, 10],
+    "max_features": [None, "sqrt", "log2"],
+    "ccp_alpha": [0.0, 0.001, 0.01]
+}
+
+# Grid search
+grid_search = GridSearchCV(
+    estimator=tree_model,
+    param_grid=parameter_test,
+    scoring="recall",   
+    cv=5,
+    n_jobs=-1,
+    verbose=2
+)
+
+# Fit on training data
+grid_search.fit(Xlearn, Ylearn)
+
+# Best model
+best_model = grid_search.best_estimator_
+
+print("Best Parameters:", grid_search.best_params_)
+print("Best Cross-Validation Score:", grid_search.best_score_)
 
 plt.figure(figsize=(20,10))
 
 tree.plot_tree(
-    tree_model,
+    best_model,
     feature_names = x.columns,
     class_names = ["Normal", "Failure"],
     filled = True
@@ -43,7 +70,13 @@ tree.plot_tree(
 
 plt.show()
 
-probabilities = tree_model.predict_proba(XTest)[:,1]
+probabilities = best_model.predict_proba(XTest)[:,1]
+
+train_score = best_model.score(Xlearn, Ylearn)
+test_score = best_model.score(XTest, YTest)
+
+print("Train:", train_score)
+print("Test:", test_score)
 
 y_pred = (probabilities > 0.5).astype(int)
 accuracy = accuracy_score(YTest, y_pred)
@@ -52,7 +85,7 @@ recall = recall_score(YTest, y_pred)
 f1 = f1_score(YTest, y_pred)
 cm = confusion_matrix(YTest, y_pred)
 
-y_scores = tree_model.predict_proba(XTest)[:,1]
+y_scores = best_model.predict_proba(XTest)[:,1]
 fpr, tpr, thresholds = roc_curve(YTest, y_scores)
 roc_auc = auc(fpr, tpr)
 print("AUC:", roc_auc)

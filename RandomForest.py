@@ -1,14 +1,10 @@
-import numpy as np
-import sys
-import matplotlib
 import pandas as pd
-from sklearn import tree
 from sklearn.ensemble import RandomForestClassifier
 import matplotlib.pyplot as plt
 import seaborn
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
 from sklearn.model_selection import RandomizedSearchCV
-
+from sklearn.model_selection import train_test_split
 
 df = pd.read_csv("dataset_output.csv") #Reads the dataset.csv file
 
@@ -16,24 +12,31 @@ features = ["Air_Temperature","Process_Temperature","Rotational_Speed","Torque",
 y = df["Operation"]
 
 x = df[features]
-trainingvalues = int(len(x)*0.8) #splits the data into training set and testing set with a ratio of 80:20 split
-Xlearn = x[:trainingvalues]
-Ylearn = y[:trainingvalues]
-XTest = x[trainingvalues:]
-YTest = y[trainingvalues:]
+#trainingvalues = int(len(x)*0.8) #splits the data into training set and testing set with a ratio of 80:20 split
+#Xlearn = x[:trainingvalues]
+#Ylearn = y[:trainingvalues]
+#XTest = x[trainingvalues:]
+#YTest = y[trainingvalues:]
 
+Xlearn, XTest, Ylearn, YTest = train_test_split(
+    x, y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
 
 parameter_test = {
+    "criterion": ["gini", "entropy", "log_loss"],
     'n_estimators': [100, 200, 300, 400, 500], #number of decision trees
-    'max_depth': [None, 10, 20, 30, 40],       #Sets the maximum number of levels between the root node to the deepest leaf  
+    "max_depth": [3, 5, 7, 10, 15, 20],
     'min_samples_split': [2, 5, 10],           #minimum samples needed to split a node
     'min_samples_leaf': [1, 2, 4],             #minimum samples required in a leaf node after a split
     'max_features': ['sqrt', 'log2'],
-    'class_weight': [None, 'balanced']           #
+    'class_weight': [None, 'balanced']
 }
 
 
-rf_model = RandomForestClassifier() 
+rf_model = RandomForestClassifier(random_state=3) 
 
 
 random_search = RandomizedSearchCV(
@@ -41,9 +44,9 @@ random_search = RandomizedSearchCV(
     param_distributions = parameter_test,
     n_iter = 50,
     cv = 5,
-    scoring = 'accuracy',
+    scoring = 'recall',
     n_jobs=-1,  #number of cpus - all
-    random_state= 42 
+    random_state= 3
     )
 
 random_search.fit(Xlearn, Ylearn)
@@ -68,6 +71,13 @@ y_scores = best_model.predict_proba(XTest)[:,1]
 fpr, tpr, thresholds = roc_curve(YTest, y_scores)
 roc_auc = auc(fpr, tpr)
 print("AUC:", roc_auc)
+
+train_score = best_model.score(Xlearn, Ylearn)
+test_score = best_model.score(XTest, YTest)
+
+print("Train:", train_score)
+print("Test:", test_score)
+print("\n")
 
 print("Accuracy:", accuracy)
 print("Precision:", precision)

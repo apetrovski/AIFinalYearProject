@@ -49,7 +49,7 @@ grid_search = GridSearchCV(
     log_model, 
     parameter_test,
     cv = 5,
-    scoring = 'recall',
+    scoring = 'f1',
     n_jobs=-1,  #number of cpus - all
     )
 
