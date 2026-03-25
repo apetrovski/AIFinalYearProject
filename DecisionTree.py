@@ -7,6 +7,8 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score, confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
 from sklearn.model_selection import train_test_split
 
+import os
+os.makedirs("results", exist_ok=True)
 
 df = pd.read_csv("dataset_output.csv") #Reads the dataset.csv file
 
@@ -105,8 +107,10 @@ plt.xlabel("False Positive Rate")
 plt.ylabel("True Positive Rate")
 plt.title("ROC Curve")
 plt.legend(loc="lower right")
-
+plt.savefig("results/ROC_curve_DecisionTree.png")
 plt.show()
+plt.close()
+
 
 plt.figure(figsize=(6, 5))
 seaborn.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
@@ -117,4 +121,20 @@ plt.title("Confusion Matrix for Predictive Maintenance Model")
 plt.xlabel("Predicted Label")
 plt.ylabel("True Label")
 plt.tight_layout()
+plt.savefig("results/confusion_matrix_DecisionTree.png")
 plt.show()
+plt.close()
+
+with open("results/results_DecisionTree.txt", "w") as f:
+    f.write(f"Accuracy: {accuracy}\n")
+    f.write(f"Precision: {precision}\n")
+    f.write(f"Recall: {recall}\n")
+    f.write(f"F1 Score: {f1}\n")
+    f.write(f"AUC: {roc_auc}\n")
+    f.write(f"Best Parameters: {grid_search.best_params_}\n")
+    f.write(f"Best Cross-Validation Score: {grid_search.best_score_}\n")
+    f.write(f"Training score:{train_score}\n")
+    f.write(f"Testing score:{test_score}\n")
+    f.write("Feature Importance:\n")
+    for feature, importance in zip(features, best_model.feature_importances_):
+        f.write(f"{feature}: {importance:.4f}\n")

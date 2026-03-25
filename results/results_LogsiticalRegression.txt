@@ -1,0 +1,12 @@
+Accuracy: 0.889615
+Precision: 0.7948811290638739
+Recall: 0.6580277249756595
+F1 Score: 0.7200091313776966
+Best Parameters:: {'C': 0.01, 'class_weight': None, 'penalty': 'l1', 'solver': 'saga'}
+Best Cross-Validation Score: 0.8881500000000001
+Coefficients:
+Air_Temperature: 0.6362
+Process_Temperature: -0.4420
+Rotational_Speed: -0.3708
+Torque: 0.0000
+Tool_wear: 2.0867

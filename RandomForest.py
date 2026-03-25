@@ -6,6 +6,9 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import train_test_split
 
+import os
+os.makedirs("results", exist_ok=True)
+
 df = pd.read_csv("dataset_output.csv") #Reads the dataset.csv file
 
 features = ["Air_Temperature","Process_Temperature","Rotational_Speed","Torque","Tool_wear"] #Splits the data set into features of the machine and operation values
@@ -42,8 +45,8 @@ rf_model = RandomForestClassifier(random_state=3)
 random_search = RandomizedSearchCV(
     rf_model, 
     param_distributions = parameter_test,
-    n_iter = 50,
-    cv = 5,
+    n_iter = 33,
+    cv = 3,
     scoring = 'recall',
     n_jobs=-1,  #number of cpus - all
     random_state= 3
@@ -94,8 +97,10 @@ plt.xlabel("False Positive Rate")
 plt.ylabel("True Positive Rate")
 plt.title("ROC Curve")
 plt.legend(loc="lower right")
-
+plt.savefig("results/ROC_curve_RandomForest.png")
 plt.show()
+plt.close()
+
 
 plt.figure(figsize=(6, 5))
 seaborn.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
@@ -106,4 +111,17 @@ plt.title("Confusion Matrix for Predictive Maintenance Model")
 plt.xlabel("Predicted Label")
 plt.ylabel("True Label")
 plt.tight_layout()
+plt.savefig("results/confusion_matrix_RandomForest.png")
 plt.show()
+plt.close()
+
+with open("results/results_RandomForest.txt", "w") as f:
+    f.write(f"Accuracy: {accuracy}\n")
+    f.write(f"Precision: {precision}\n")
+    f.write(f"Recall: {recall}\n")
+    f.write(f"F1 Score: {f1}\n")
+    f.write(f"Best Parameters: {random_search.best_params_}\n")
+    f.write(f"Best Cross-Validation Score: {random_search.best_score_}\n")
+    f.write("Feature Importance:\n")
+    for feature, importance in zip(features, best_model.feature_importances_):
+        f.write(f"{feature}: {importance:.4f}\n")

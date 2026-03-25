@@ -1,7 +1,7 @@
 import numpy as np
 
 def rules(air_temp, process_temp, rota_speed, torque, tool_wear):
-    risk = -4.5   # baseline keeps most normal cases as non-failures
+    risk = -4   # baseline keeps most normal cases as non-failures
 
     # 1. Air temperature
     # Ambient temperature alone is not usually a direct failure cause,
@@ -61,7 +61,7 @@ def rules(air_temp, process_temp, rota_speed, torque, tool_wear):
     failure_prob = 1 / (1 + np.exp(-risk))
 
     # Generate failure outcome
-    if failure_prob >= 0.5:
+    if failure_prob >= 0.35:
         return 1
     else: 
         return 0
