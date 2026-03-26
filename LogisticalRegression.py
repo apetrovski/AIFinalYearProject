@@ -12,7 +12,7 @@ os.makedirs("results", exist_ok=True)
 
 scaler = StandardScaler()
 
-df = pd.read_csv("dataset_output.csv")
+df = pd.read_csv("dataset_output2.csv")
 
 features = ["Air_Temperature","Process_Temperature","Rotational_Speed","Torque","Tool_wear"]
 y = df["Operation"]

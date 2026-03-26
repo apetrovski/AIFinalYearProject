@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix, accuracy_score, pr
 import os
 os.makedirs("results", exist_ok=True)
 
-df = pd.read_csv("dataset_output.csv") #Reads the dataset.csv file
+df = pd.read_csv("dataset_output2.csv") #Reads the dataset.csv file
 
 features = ["Air_Temperature","Process_Temperature","Rotational_Speed","Torque","Tool_wear"] #Splits the data set into features of the machine and operation values
 y = df["Operation"]

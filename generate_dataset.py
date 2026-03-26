@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import sys
 
-from rules import rules
+from rules2 import rules
 
 np.random.seed(3) #makes sure the random number generator produces the same values everytime. Makes sure that the dataset is reproducible.
 

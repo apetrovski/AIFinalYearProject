@@ -1,10 +1,15 @@
-Accuracy: 0.990875
-Precision: 0.9948257276320518
-Recall: 0.9627010987992025
-F1 Score: 0.9784998173957093
-AUC: 0.9996893895878742
+Accuracy: 0.98938
+Precision: 0.9934482489665393
+Recall: 0.9660952669902912
+F1 Score: 0.9795808498365699
+AUC: 0.9995586889574579
 Best Parameters: {'subsample': 0.8, 'n_estimators': 200, 'min_samples_split': 10, 'min_samples_leaf': 1, 'max_depth': 5, 'learning_rate': 0.1}
-Best Cross-Validation Score: 0.99088
-Training score:0.99242
-Testing score:0.990875
+Best Cross-Validation Score: 0.9891625
+Training score:0.99071125
+Testing score:0.98938
 Feature Importance:
+Air_Temperature: 0.0615
+Process_Temperature: 0.1863
+Rotational_Speed: 0.4098
+Torque: 0.0000
+Tool_wear: 0.3424
