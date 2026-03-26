@@ -31,7 +31,8 @@ plt.figure(figsize=(8,6))
 corr = df.corr()
 sns.heatmap(corr, annot=True, cmap="coolwarm")                          
 plt.title("Correlation Matrix")                                        #Correlation matrix         
-plt.savefig("results/correlation_heatmap.png")
+plt.tight_layout()
+plt.savefig("results/correlation_matrix.png", bbox_inches='tight')
 plt.close()
 
 sns.scatterplot(x="Torque", y="Tool_wear", hue="Operation", data=df)
@@ -39,7 +40,20 @@ plt.title("Torque vs Tool Wear")
 plt.savefig("results/scatter_torque_toolwear.png")
 plt.close()
 
-sns.countplot(x="Operation", data=df)
-plt.title("Class Distribution")                                         #Class distribution
-plt.savefig("results/class_distribution.png")   
+plt.figure()
+ax = sns.countplot(x="Operation", data=df)
+
+# Add values on top of bars
+for p in ax.patches:
+    height = int(p.get_height())
+    ax.annotate(
+        f'{height}',
+        (p.get_x() + p.get_width() / 2., height),
+        ha='center',
+        va='bottom',
+        fontsize=10
+    )
+
+plt.title("Class Distribution")
+plt.savefig("results/class_distribution.png")
 plt.close()

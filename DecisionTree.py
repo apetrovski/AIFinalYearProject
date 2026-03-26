@@ -16,11 +16,6 @@ features = ["Air_Temperature","Process_Temperature","Rotational_Speed","Torque",
 y = df["Operation"]
 
 x = df[features]
-trainingvalues = int(len(x)*0.8) #splits the data into training set and testing set with a ratio of 80:20 split
-Xlearn = x[:trainingvalues]
-Ylearn = y[:trainingvalues]
-XTest = x[trainingvalues:]
-YTest = y[trainingvalues:]
 
 Xlearn, XTest, Ylearn, YTest = train_test_split(
     x, y,
@@ -69,7 +64,7 @@ tree.plot_tree(
     class_names = ["Normal", "Failure"],
     filled = True
 )
-
+plt.savefig("results/DecisionTree.png")
 plt.show()
 
 probabilities = best_model.predict_proba(XTest)[:,1]

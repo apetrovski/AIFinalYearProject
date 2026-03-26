@@ -1,0 +1,15 @@
+Accuracy: 0.990195
+Precision: 0.9802654598894306
+Recall: 0.9741527191803051
+F1 Score: 0.9771995302707919
+AUC: 0.9860459324765246
+Best Parameters: {'ccp_alpha': 0.0, 'criterion': 'entropy', 'max_depth': 20, 'max_features': None, 'min_samples_leaf': 1, 'min_samples_split': 2}
+Best Cross-Validation Score: 0.9728600405679512
+Training score:0.9993025
+Testing score:0.990195
+Feature Importance:
+Air_Temperature: 0.0830
+Process_Temperature: 0.1494
+Rotational_Speed: 0.2228
+Torque: 0.0030
+Tool_wear: 0.5418

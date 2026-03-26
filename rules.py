@@ -4,8 +4,6 @@ def rules(air_temp, process_temp, rota_speed, torque, tool_wear):
     risk = -4   # baseline keeps most normal cases as non-failures
 
     # 1. Air temperature
-    # Ambient temperature alone is not usually a direct failure cause,
-    # so it gets a smaller weighting.
     if air_temp > 303:
         risk += 0.4 * (air_temp - 303)
     elif air_temp < 297:

@@ -21,7 +21,7 @@ x = df[features]
 #YTest = y[trainingvalues:]
 
 Xlearn, XTest, Ylearn, YTest = train_test_split(
-    x, y, test_size=0.2, random_state=42,
+    x, y, test_size=0.2, random_state=42, stratify=y
 )
 
 model = GradientBoostingClassifier()
@@ -121,5 +121,5 @@ with open("results/results_gradient_boosting.txt", "w") as f:
     f.write(f"Training score:{train_score}\n")
     f.write(f"Testing score:{test_score}\n")
     f.write("Feature Importance:\n")
-    for feature, importance in zip(features, model.feature_importances_):
+    for feature, importance in zip(features, best_model.feature_importances_):
         f.write(f"{feature}: {importance:.4f}\n")
